@@ -22,6 +22,8 @@ import WeeklyOverview from 'src/views/dashboard/WeeklyOverview'
 import DepositWithdraw from 'src/views/dashboard/DepositWithdraw'
 import SalesByCountries from 'src/views/dashboard/SalesByCountries'
 
+import WithAuth from '../components/WithAuth'
+
 const Dashboard = () => {
   return (
     <ApexChartWrapper>
@@ -98,4 +100,5 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default WithAuth(Dashboard, ['superadmin'])
+
