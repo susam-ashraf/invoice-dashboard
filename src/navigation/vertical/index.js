@@ -35,6 +35,14 @@ const navigation = () => {
       icon: AccountPlusOutline,
       path: '/register-user'
     },
+    {
+      sectionTitle: 'Add Clients'
+    },
+    {
+      title: 'Upload Excel/CSV',
+      icon: AccountCogOutline,
+      path: '/bulk-upload-client'
+    },
     // {
     //   sectionTitle: 'Pages'
     // },
