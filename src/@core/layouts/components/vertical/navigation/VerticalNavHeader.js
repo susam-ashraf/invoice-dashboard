@@ -47,7 +47,10 @@ const VerticalNavHeader = props => {
       ) : (
         <Link href='/' passHref>
           <StyledLink>
-            <svg
+
+            <img style={{margin: '50px 0'}} width={170} alt='fattura' src='/images/logo_fattura.png' />
+
+            {/* <svg
               width={30}
               height={25}
               version='1.1'
@@ -105,10 +108,10 @@ const VerticalNavHeader = props => {
                   </g>
                 </g>
               </g>
-            </svg>
-            <HeaderTitle variant='h6' sx={{ ml: 3 }}>
+            </svg> */}
+            {/* <HeaderTitle variant='h6' sx={{ ml: 3 }}>
               {themeConfig.templateName}
-            </HeaderTitle>
+            </HeaderTitle> */}
           </StyledLink>
         </Link>
       )}

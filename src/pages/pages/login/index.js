@@ -100,62 +100,61 @@ const LoginPage = () => {
     e.preventDefault()
 
     // if(!errors['email'] && !errors['password']) {
-      const submitData = {
-        email: values.email,
-        password: values.password
-      }
+    const submitData = {
+      email: values.email,
+      password: values.password
+    }
 
-      return (
-        axios({
-          url: `${BASE_URL}/api/login`,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          data: submitData,
-          method: 'post'
-        })
-          .then(response => {
-            // console.log('token print----- : ', response.data)
-            setLoginResponse(response.data)
-            // localStorage.setItem('token', response.data.token);
-            if (response.data.status === 'success' && response.data?.authorisation?.token) {
-              Cookies.set('cToken', response.data?.authorisation?.token)
-              Cookies.set('cRole', response.data.user.role)
-              Cookies.set('cName', response.data.user.name)
-              Cookies.set('cEmail', response.data.user.email)
-              if (response.data.user.role === 'superadmin') {
-                console.log('---- super ----')
-                return Router.push('/')
-              } else {
-                handleLogout()
-              }
+    return (
+      axios({
+        url: `${BASE_URL}/api/login`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: submitData,
+        method: 'post'
+      })
+        .then(response => {
+          // console.log('token print----- : ', response.data)
+          setLoginResponse(response.data)
+          // localStorage.setItem('token', response.data.token);
+          if (response.data.status === 'success' && response.data?.authorisation?.token) {
+            Cookies.set('cToken', response.data?.authorisation?.token)
+            Cookies.set('cRole', response.data.user.role)
+            Cookies.set('cName', response.data.user.name)
+            Cookies.set('cEmail', response.data.user.email)
+            if (response.data.user.role === 'superadmin') {
+              console.log('---- super ----')
+              return Router.push('/')
+            } else {
+              handleLogout()
             }
-          })
-          // .then((json) => ({
-          //   type: 'SUCCESS',
-          //   payload: json,
-          // }))
-          .catch(err => {
-            // if (getToken() && err && err.response && err.response.status === 401) {
-            //   logOut()
-            // } else {
-            //   return {
-            //     type: 'FAIL',
-            //   }
-            // }
-            console.log('token print error ----- : ', err)
-          })
-      )
+          }
+        })
+        // .then((json) => ({
+        //   type: 'SUCCESS',
+        //   payload: json,
+        // }))
+        .catch(err => {
+          // if (getToken() && err && err.response && err.response.status === 401) {
+          //   logOut()
+          // } else {
+          //   return {
+          //     type: 'FAIL',
+          //   }
+          // }
+          console.log('token print error ----- : ', err)
+        })
+    )
     // }
-
   }
 
   return (
     <Box className='content-center'>
       <Card sx={{ zIndex: 1 }}>
         <CardContent sx={{ padding: theme => `${theme.spacing(12, 9, 7)} !important` }}>
-          <Box sx={{ mb: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg
+          <Box sx={{ mb: 12, mt: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* <svg
               width={35}
               height={29}
               version='1.1'
@@ -213,8 +212,11 @@ const LoginPage = () => {
                   </g>
                 </g>
               </g>
-            </svg>
-            <Typography
+            </svg> */}
+
+            <img width={170} alt='fattura' src='/images/logo_fattura.png' />
+
+            {/* <Typography
               variant='h6'
               sx={{
                 ml: 3,
@@ -225,7 +227,7 @@ const LoginPage = () => {
               }}
             >
               {themeConfig.templateName}
-            </Typography>
+            </Typography> */}
           </Box>
           <Box sx={{ mb: 6 }}>
             <Typography variant='h5' sx={{ fontWeight: 600, marginBottom: 1.5 }}>
@@ -284,7 +286,7 @@ const LoginPage = () => {
             >
               Login
             </Button>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {/* <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
               <Typography variant='body2' sx={{ marginRight: 2 }}>
                 New on our platform?
               </Typography>
@@ -293,7 +295,7 @@ const LoginPage = () => {
                   <LinkStyled>Create an account</LinkStyled>
                 </Link>
               </Typography>
-            </Box>
+            </Box> */}
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>

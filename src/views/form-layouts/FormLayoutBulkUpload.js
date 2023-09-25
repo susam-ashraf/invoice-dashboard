@@ -30,17 +30,16 @@ import EyeOutline from 'mdi-material-ui/EyeOutline'
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 import { MenuItem, Select } from '@mui/material'
 
-import XLSX from 'xlsx'
+import * as xlsx from 'xlsx'
 
 const FormLayoutsBulkUpload = () => {
   // ** States
   const [users, setUsers] = useState([])
-  const [values, setValues] = useState({
-    userId: ''
-  })
+  const [clientsData, setClientsData] = useState([])
+  const [userId, setUserId] = useState()
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [excelData, setExcelData] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [excelData, setExcelData] = useState([])
 
   const [confirmPassValues, setConfirmPassValues] = useState({
     password: '',
@@ -79,25 +78,57 @@ const FormLayoutsBulkUpload = () => {
     setValues({ ...values, [prop]: event.target.value })
   }
 
-    // Function to handle file input change
-    const handleFileChange = (event) => {
-      const file = event.target.files[0];
-      setSelectedFile(file);
-  
-      // Read the Excel file and convert it to a JavaScript object
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0]; // Assuming you have only one sheet
-          const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-          setExcelData(jsonData);
-        };
-        reader.readAsArrayBuffer(file);
+  const readUploadFile = e => {
+    e.preventDefault()
+    setSelectedFile(e.target.files[0])
+    if (e.target.files) {
+      const reader = new FileReader()
+      reader.onload = e => {
+        const data = e.target.result
+        const workbook = xlsx.read(data, { type: 'array' })
+        const sheetName = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetName]
+        const json = xlsx.utils.sheet_to_json(worksheet)
+        console.log('json----', json)
+        setClientsData(json)
       }
-    };
+      reader.readAsArrayBuffer(e.target.files[0])
+    }
+  }
+
+  const submitBulkUpload = e => {
+    e.preventDefault()
+
+    // if(!errors['email'] && !errors['password']) {
+    const submitData = {
+      clientsData: clientsData,
+      userId: userId
+    }
+
+    return (
+      axios({
+        url: `${BASE_URL}/api/bulk-upload-clients`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: submitData,
+        method: 'post'
+      })
+        .then(response => {
+
+          if (response?.data?.status === 'success') {
+            console.log('------bulk-upload-clients Succ-----')
+            // return Router.push('/users/')
+          }
+        })
+
+        .catch(err => {
+
+          console.log('token print error ----- : ', err)
+        })
+    )
+    // }
+  }
 
   const handleConfirmPassChange = prop => event => {
     setConfirmPassValues({ ...confirmPassValues, [prop]: event.target.value })
@@ -115,52 +146,6 @@ const FormLayoutsBulkUpload = () => {
     event.preventDefault()
   }
 
-  const submitRegister = e => {
-    e.preventDefault()
-
-    const submitData = {
-      user_id: values.userId,
-      users: excelData
-    }
-
-    console.log(submitData)
-
-    return (
-      axios({
-        url: `${BASE_URL}/api/register`,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: submitData,
-        method: 'post'
-      })
-        .then(response => {
-          // console.log('token print----- : ', response.data)
-          // setLoginResponse(response.data)
-          // localStorage.setItem('token', response.data.token);
-          if (response?.data?.status === 'success') {
-            console.log('------register Succ-----')
-            return Router.push('/users/')
-          }
-        })
-        // .then((json) => ({
-        //   type: 'SUCCESS',
-        //   payload: json,
-        // }))
-        .catch(err => {
-          // if (getToken() && err && err.response && err.response.status === 401) {
-          //   logOut()
-          // } else {
-          //   return {
-          //     type: 'FAIL',
-          //   }
-          // }
-          console.log('token print error ----- : ', err)
-        })
-    )
-    // }
-  }
-
   const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
     clipPath: 'inset(50%)',
@@ -175,11 +160,11 @@ const FormLayoutsBulkUpload = () => {
 
   return (
     <Card>
-      <CardHeader title='Bulk Upload Clients' titleTypographyProps={{ variant: 'h6' }} />
+      <CardHeader title='Bulk Upload Clients' titleTypographyProps={{ variant: 'h6' }} sx={{margin: '20px 0'}} />
       <CardContent>
-        <form onSubmit={submitRegister}>
+        <form onSubmit={submitBulkUpload}>
           <Grid container spacing={5}>
-            <Grid item xs={12}>
+            <Grid item xs={4}>
               <FormControl fullWidth>
                 <InputLabel id='User'>User</InputLabel>
                 <Select
@@ -188,41 +173,32 @@ const FormLayoutsBulkUpload = () => {
                   id='user'
                   labelId='User'
                   name='userId'
-                  onChange={handleChange('userId')}
+                  onChange={(e) => {
+                    setUserId(e.target.value)
+                  }}
                   helperText='You can use letters, numbers & periods'
                 >
-                  <MenuItem value=''>None</MenuItem>
-                  {users ? users.map(user => <MenuItem value={user.id}>{user.name}</MenuItem>) : null}
+
+                  {users ? users.map(user => <MenuItem value={user.id}>{user.name}</MenuItem>) : <MenuItem value=''>None</MenuItem>}
                 </Select>
               </FormControl>
             </Grid>
 
-
-
-<Grid item xs={12}>
-      <FormControl>
-        <Button
-          component='label'
-          variant='contained'
-          startIcon={<CloudUploadIcon />}
-        >
-          Select file
-          <input
-            type='file'
-            accept=''
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
-        </Button>
-        <Box sx={{pt: 2}}>
-          {selectedFile ? (
-            <Typography>{selectedFile.name}</Typography>
-          ) : (
-            <Typography>No file selected yet</Typography>
-          )}
-        </Box>
-      </FormControl>
-    </Grid>
+            <Grid item xs={12}>
+              <FormControl>
+                <Button component='label' variant='contained' startIcon={<CloudUploadIcon />}>
+                  Select file
+                  <input type='file' name='upload' id='upload' onChange={readUploadFile} style={{ display: 'none' }} />
+                </Button>
+                <Box sx={{ pt: 2 }}>
+                  {selectedFile ? (
+                    <Typography>{selectedFile.name}</Typography>
+                  ) : (
+                    <Typography>No file selected yet</Typography>
+                  )}
+                </Box>
+              </FormControl>
+            </Grid>
           </Grid>
           <Grid item xs={12}>
             <Box
