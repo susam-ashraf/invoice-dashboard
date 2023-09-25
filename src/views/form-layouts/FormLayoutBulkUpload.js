@@ -118,7 +118,7 @@ const FormLayoutsBulkUpload = () => {
 
           if (response?.data?.status === 'success') {
             console.log('------bulk-upload-clients Succ-----')
-            // return Router.push('/users/')
+            return Router.push('/users/')
           }
         })
 
