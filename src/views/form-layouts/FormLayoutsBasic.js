@@ -41,9 +41,23 @@ const FormLayoutsBasic = () => {
     password: '',
     showPassword: false
   })
+  const [isValidateNumber, setIsValidateNumber] = useState(false)
+
+  const checkPasswordValidity = value => {
+    const isContainsNumber = /^(?=.*[0-9]).*$/
+    if (!isContainsNumber.test(value)) {
+      // return 'Password must contain at least one Digit.';
+      setIsValidateNumber(false)
+    } else {
+      setIsValidateNumber(true)
+    }
+  }
 
   const handleChange = prop => event => {
     setValues({ ...values, [prop]: event.target.value })
+    if (prop === 'password') {
+      checkPasswordValidity(event.target.value)
+    }
   }
 
   const handleConfirmPassChange = prop => event => {
@@ -211,7 +225,12 @@ const FormLayoutsBasic = () => {
                   justifyContent: 'space-between'
                 }}
               >
-                <Button type='submit' variant='contained' size='large'>
+                <Button
+                  type='submit'
+                  disabled={!values.password || values.password !== confirmPassValues.password || !isValidateNumber}
+                  variant='contained'
+                  size='large'
+                >
                   Register User
                 </Button>
                 {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>

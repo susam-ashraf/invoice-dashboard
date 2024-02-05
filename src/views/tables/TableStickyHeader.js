@@ -1,6 +1,10 @@
 // ** React Imports
 import { useState, useEffect } from 'react'
 
+// ** Next Imports
+import Link from 'next/link'
+import Router, { useRouter } from 'next/router'
+
 import axios from 'axios'
 
 import { BASE_URL } from '../../../env'
@@ -14,11 +18,14 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
+import EditIcon from '@mui/icons-material/Edit'
+import Button from '@mui/material/Button'
 
 const columns = [
   { id: 'name', label: 'Name', minWidth: 170 },
   { id: 'email', label: 'Email', minWidth: 170 },
-  { id: 'phone', label: 'Phone No', minWidth: 170 }
+  { id: 'phone', label: 'Phone No', minWidth: 170 },
+  { id: 'action', label: 'Action', minWidth: 170 }
 ]
 // function createData(name, email, phone) {
 //   return { name, email, phone}
@@ -34,6 +41,8 @@ const columns = [
 // ]
 
 const TableStickyHeader = () => {
+  const router = useRouter()
+
   // ** States
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -66,11 +75,9 @@ const TableStickyHeader = () => {
         console.log('user print----- : ', response.data)
 
         response.data.users.map(item => {
-
           if (item.role !== 'superadmin') {
-            buffer.push({ name: item.name, email: item.email, phone: item.phone })
+            buffer.push({ id: item.id, name: item.name, email: item.email, phone: item.phone })
           }
-
         })
 
         setRows(buffer)
@@ -110,15 +117,31 @@ const TableStickyHeader = () => {
             {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
               return (
                 <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
-                  {columns.map(column => {
-                    const value = row[column.id]
+                  {columns
+                    .filter(column => column.id != 'action')
+                    .map(column => {
+                      const value = row[column.id]
 
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number' ? column.format(value) : value}
-                      </TableCell>
-                    )
-                  })}
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {column.format && typeof value === 'number' ? column.format(value) : value}
+                        </TableCell>
+                      )
+                    })}
+                  <TableCell>
+                    <Button
+                      sx={{ marginBottom: 7 }}
+                      onClick={() =>
+                        router.push({
+                          pathname: '/edit-user',
+                          query: { userData: JSON.stringify(row) }
+                        })
+                      }
+                      type='button'
+                    >
+                      <EditIcon sx={{ marginRight: 2, fontSize: '1.375rem', color: '#EC533D' }} />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               )
             })}
